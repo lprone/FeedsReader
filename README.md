@@ -1,1 +1,1 @@
-# FeedReader
+# FeedsReader
