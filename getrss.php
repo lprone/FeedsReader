@@ -57,24 +57,6 @@
         echo "<hr />";
       };
       break;
-    case 'telediario':
-      $xml = file_get_contents('http://feeds2.feedburner.com/telediariodigital');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
-      break;
-    case 'rio4info':
-      $xml=("https://www.riocuartoinfo.com/feed");
-      $xml_data = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach ($xml_data->channel->item as $item) {
-         echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-         echo "<p>" . $item->description . "</p>";
-         echo "<hr />";
-      };
-      break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     case 'BBC':
       $xml=("http://feeds.bbci.co.uk/mundo/rss.xml");
