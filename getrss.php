@@ -1,222 +1,130 @@
 <?php
   $q=$_GET["q"];
-  echo "<hr />";
+  libxml_use_internal_errors(true);
   switch ($q) {
     case 'Clarin':
-      $xml=("http://www.clarin.com/rss/lo-ultimo/");
-      $xml_data = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach ($xml_data->channel->item as $item) {
-         echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-         echo "<p>" . $item->description . "</p>";
-         echo "<hr />";
-      };
+      read_channel_item("http://www.clarin.com/rss/lo-ultimo/");
       break;
-    case 'Nacion':
-      $xml=("http://contenidos.lanacion.com.ar/herramientas/rss-origen=2");
-      $xml_data = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach ($xml_data->entry as $entry) {
-         echo '<a href="'.$entry->link['href'].'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$entry->title.' </h3> </a>';
-         echo "<p>" . $entry->content->div . "</p>";
-         echo "<hr />";
-      };
+    case 'LaNacion':
+      read_entry("http://contenidos.lanacion.com.ar/herramientas/rss-origen=2");
       break;
-    case 'iprofesional':
-      $xml = file_get_contents('https://www.iprofesional.com/rss/home');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+    case 'Iprofesional':
+      read_channel_item('https://www.iprofesional.com/rss/home');
       break;
-    case 'infobae':
-      //$xml = file_get_contents('http://cdn01.am.infobae.com/adjuntos/163/rss/ahora.xml');
-	  libxml_use_internal_errors(true);
-	  try {
-         $xml = file_get_contents('http://www.infobae.com/argentina-rss.xml');
-         $xmlobj = new SimpleXMLElement($xml);
-         $aux = 'lalala';
-         foreach($xmlobj->channel->item as $item) {
-           if (strcmp($aux, $item->title) != 0) {
-              echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-              echo "<p>" . $item->description . "</p>";
-              echo "<hr />";
-              $aux = $item->title;
-           }
-         }
-	  } catch (Exception $e) {echo 'No se descargó XML de Infobae';}
+    case 'Infobae':
+      read_channel_item('http://www.infobae.com/argentina-rss.xml');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    case 'laVoz':
-      //$xml = file_get_contents('http://www.lavoz.com.ar/rss.xml');
-      $xml = file_get_contents('http://srvc.lavoz.com.ar/rss.xml');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+    case 'LaVoz':
+      read_channel_item('http://srvc.lavoz.com.ar/rss.xml');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     case 'BBC':
-      $xml=("http://feeds.bbci.co.uk/mundo/rss.xml");
-      $xml_data = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach ($xml_data->channel->item as $entry) {
-        echo '<a href="'.$entry->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$entry->title.' </h3> </a>';
-        echo "<p>" . $entry->description . "</p>";
-        echo "<hr />";
-      };
+      read_channel_item("http://feeds.bbci.co.uk/mundo/rss.xml");
       break;
-    case 'cnn':
-      $xml = file_get_contents('http://cnnespanol.cnn.com/author/cnn-espanol/feed/');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+    case 'LaNacionMundo':
+      read_entry('http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=7');
       break;
-    case 'NacionMundo':
-      $xml= ('http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=7');
-      $xmlobj = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach($xmlobj->entry as $item) {
-        echo '<a href="'.$item->link['href'].'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->content->div  . "</p>";
-        echo "<hr />";
-      };
+    case 'CNN':
+      read_channel_item('http://cnnespanol.cnn.com/author/cnn-espanol/feed/');
       break;
     case 'MuyInt':
-      $xml = file_get_contents('http://feeds2.feedburner.com/Muyinteresantees');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+      read_channel_item('http://feeds2.feedburner.com/Muyinteresantees');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     case 'ClarinTecno':
-      //$xml=("http://www.clarin.com/rss/next/");
-      $xml=("https://www.clarin.com/rss/tecnologia/");
-      $xml_data = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach ($xml_data->channel->item as $item) {
-         echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-         echo "<p>" . $item->description . "</p>";
-         echo "<hr />";
-      };
+      read_channel_item("https://www.clarin.com/rss/tecnologia/");
       break;
-    case 'NacionTecno':
-      $xml=("http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=432");
-      $xml_data = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach ($xml_data->entry as $entry) {
-         echo '<a href="'.$entry->link['href'].'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$entry->title.' </h3> </a>';
-         echo "<p>" . $entry->content->div . "</p>";
-         echo "<hr />";
-      };
+    case 'LaNacionTecno':
+      read_entry("http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=432");
       break;
-    case 'vozTecno':
-      $xml = file_get_contents('http://srvc.lavoz.com.ar/taxonomy/term/23342/1/feed');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+    case 'LaVozTecno':
+      read_channel_item('http://srvc.lavoz.com.ar/taxonomy/term/23342/1/feed');
       break;
-    case 'muyComputer':
-      $xml = file_get_contents('http://www.muycomputer.com/feed/');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+    case 'MuyComputer':
+      read_channel_item('http://www.muycomputer.com/feed/');
       break;
-    case 'ticbeat':
-      $xml = file_get_contents('http://www.ticbeat.com/feed/');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+    case 'Ticbeat':
+      read_channel_item('http://www.ticbeat.com/feed/');
       break;
-	case 'fayerWayer':
-      $xml = file_get_contents('http://feeds2.feedburner.com/fayerwayer');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-		echo "<br><br><br><br><br><br>";
-        echo "<hr />";
-      };
+	  case 'FayerWayer':
+      read_fawerWayer('http://feeds2.feedburner.com/fayerwayer');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    case 'cliCba':
-      $xml = file_get_contents('http://xml.tutiempo.net/rss/42926.xml');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-           //echo print_r(explode('-', $item->title, -1));
-           echo '<a style="color:#000000;text-decoration:none"> <h3> '.strstr($item->title, '-').' </h3> </a>';
-           echo "<p>" . strstr($item->description, '<a', true) . "</p>";
-           echo "<hr />";
-      };
+    case 'ClimaCba':
+      read_channel_item_weather('http://xml.tutiempo.net/rss/42926.xml');
       break;
-    case 'cliR4':
-      $xml = file_get_contents('http://xml.tutiempo.net/rss/31019.xml');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-           //echo print_r(explode('-', $item->title, -1));
-           echo '<a style="color:#000000;text-decoration:none"> <h3> '.strstr($item->title, '-').' </h3> </a>';
-           echo "<p>" . strstr($item->description, '<a', true) . "</p>";
-           echo "<hr />";
-      };
+    case 'ClimaR4':
+      read_channel_item_weather('http://xml.tutiempo.net/rss/31019.xml');
+    break;
+    case 'ClimaVT':
+      read_channel_item_weather('http://xml.tutiempo.net/rss/43412.xml');
       break;
-    case 'cliVT':
-      $xml = file_get_contents('http://xml.tutiempo.net/rss/43412.xml');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-           echo '<a style="color:#000000;text-decoration:none"> <h3> '.strstr($item->title, '-').' </h3> </a>';
-           echo "<p>" . strstr($item->description, '<a', true) . "</p>";
-           echo "<hr />";
-      };
-      break;
-    case 'cliJN':
-      $xml = file_get_contents('http://xml.tutiempo.net/rss/43074.xml');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-           echo '<a style="color:#000000;text-decoration:none"> <h3> '.strstr($item->title, '-').' </h3> </a>';
-           echo "<p>" . strstr($item->description, '<a', true) . "</p>";
-           echo "<hr />";
-      };
+    case 'ClimaJN':
+      read_channel_item_weather('http://xml.tutiempo.net/rss/43074.xml');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    case 'NacionDepo':
-      $xml= ('http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=131');
-      $xmlobj = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach($xmlobj->entry as $item) {
-        echo '<a href="'.$item->link['href'].'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->content->div  . "</p>";
-        echo "<hr />";
-      };
+    case 'LaNacionDepo':
+      read_entry('http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=131');
       break;
     case 'ClarinFut':
-      $xml=("http://www.clarin.com/rss/deportes/futbol/");
-      $xml_data = new SimpleXMLElement($xml, LIBXML_NOCDATA, true);
-      foreach ($xml_data->channel->item as $item) {
-         echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-         echo "<p>" . $item->description . "</p>";
-         echo "<hr />";
-      };
+      read_channel_item("http://www.clarin.com/rss/deportes/futbol/");
       break;
-    case 'ole':
-      $xml = file_get_contents('http://www.ole.com.ar/rss/ultimas-noticias/');
-      $xmlobj = new SimpleXMLElement($xml);
-      foreach($xmlobj->channel->item as $item) {
-        echo '<a href="'.$item->link.'" target="_self" style="color:#000000;text-decoration:none"> <h3> '.$item->title.' </h3> </a>';
-        echo "<p>" . $item->description . "</p>";
-        echo "<hr />";
-      };
+    case 'OLE':
+      read_channel_item('http://www.ole.com.ar/rss/ultimas-noticias/');
       break;
-  };
+  }
+
+  function read_channel_item($url){
+    try {
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      foreach($xml->channel->item as $item) {
+        print_news($item->link, $item->title, $item->description);
+      }
+    } catch (Exception $e) {
+      echo 'No se descargó XML de ' . $url;
+    }
+  }
+
+  function read_entry($url){
+    try {
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      foreach ($xml->entry as $entry) {
+        print_news($entry->link['href'], $entry->title, $entry->content->div);
+      }
+    } catch (Exception $e) {
+      echo 'No se descargó XML de ' . $url;
+    }
+  }
+
+  function read_fawerWayer($url){
+    try {
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      foreach($xml->channel->item as $item) {
+        print_news($item->link, $item->title, $item->description);
+        echo '<br><br><br><br><br><br>';
+      }
+    } catch (Exception $e) {
+      echo 'No se descargó XML de ' . $url;
+    }
+
+  }
+  function read_channel_item_weather($url){
+    try {
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      foreach($xml->channel->item as $item) {
+        echo '<hr />';
+        echo '<a style="color:#000000;text-decoration:none"> <h3> ' . strstr($item->title, '-') . ' </h3> </a>';
+        echo '<p>' . strstr($item->description, '<a', true) . '</p>';
+      }
+    } catch (Exception $e) {
+      echo 'No se descargó XML de ' . $url;
+    }
+  }
+
+  function print_news($link, $title, $description){
+    echo '<hr />';
+    echo '<a href="' . $link . '" target="_self" style="color:#000000;text-decoration:none"> <h3> ' . $title . ' </h3> </a>';
+    echo '<p>' . $description . '</p>';
+  }
 ?>
