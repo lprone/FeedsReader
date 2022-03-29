@@ -77,7 +77,11 @@
 
   function read_channel_item($url){
     try {
-      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      $context  = stream_context_create(array('http' => array('header' => 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36')));
+      $response = file_get_contents($url, false, $context);
+      $xmlObject = simplexml_load_string($response);
+      $xml = new SimpleXMLElement($response, LIBXML_NOCDATA, true) or die($url." not loading");
+      echo $xml;
       foreach($xml->channel->item as $item) {
         print_news($item->link, $item->title, $item->description);
       }
@@ -88,7 +92,7 @@
 
   function read_entry($url){
     try {
-      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true) or die($url." not loading");
       foreach ($xml->entry as $entry) {
         print_news($entry->link['href'], $entry->title, $entry->content->div);
       }
@@ -99,7 +103,7 @@
 
   function read_fawerWayer($url){
     try {
-      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true) or die($url." not loading");
       foreach($xml->channel->item as $item) {
         print_news($item->link, $item->title, $item->description);
         echo '<br><br><br><br><br><br>';
@@ -111,7 +115,7 @@
   }
   function read_channel_item_weather($url){
     try {
-      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true) or die($url." not loading");
       foreach($xml->channel->item as $item) {
         echo '<hr />';
         echo '<a style="color:#000000;text-decoration:none"> <h3> ' . strstr($item->title, '-') . ' </h3> </a>';
