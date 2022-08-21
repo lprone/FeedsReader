@@ -3,10 +3,10 @@
   libxml_use_internal_errors(true);
   switch ($q) {
     case 'Clarin':
-      read_channel_item("http://www.clarin.com/rss/lo-ultimo/");
+      read_entry("https://www.theverge.com/rss/frontpage");
       break;
     case 'LaNacion':
-      read_entry("http://contenidos.lanacion.com.ar/herramientas/rss-origen=2");
+      read_channel_item("http://contenidos.lanacion.com.ar/herramientas/rss-origen=2");
       break;
     case 'Iprofesional':
       read_channel_item('https://www.iprofesional.com/rss/home');
@@ -16,14 +16,11 @@
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     case 'LaVoz':
-      read_channel_item('http://srvc.lavoz.com.ar/rss.xml');
+      read_channel_item('http://archivo.lavoz.com.ar/Rss/Rss.asp?origen=2');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     case 'BBC':
       read_channel_item("http://feeds.bbci.co.uk/mundo/rss.xml");
-      break;
-    case 'LaNacionMundo':
-      read_entry('http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=7');
       break;
     case 'CNN':
       read_channel_item('http://cnnespanol.cnn.com/author/cnn-espanol/feed/');
@@ -33,10 +30,7 @@
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     case 'ClarinTecno':
-      read_channel_item("https://www.clarin.com/rss/tecnologia/");
-      break;
-    case 'LaNacionTecno':
-      read_entry("http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=432");
+      read_curl_info("https://www.clarin.com/rss/tecnologia/");
       break;
     case 'LaVozTecno':
       read_channel_item('http://srvc.lavoz.com.ar/taxonomy/term/23342/1/feed');
@@ -44,11 +38,11 @@
     case 'MuyComputer':
       read_channel_item('http://www.muycomputer.com/feed/');
       break;
-    case 'Ticbeat':
-      read_channel_item('http://www.ticbeat.com/feed/');
+    case 'TechCrunch':
+      read_channel_item('https://techcrunch.com/feed/');
       break;
 	  case 'FayerWayer':
-      read_fawerWayer('http://feeds2.feedburner.com/fayerwayer');
+      read_channel_item('http://feeds2.feedburner.com/fayerwayer');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
     case 'ClimaCba':
@@ -64,9 +58,6 @@
       read_channel_item_weather('http://xml.tutiempo.net/rss/43074.xml');
       break;
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    case 'LaNacionDepo':
-      read_entry('http://contenidos.lanacion.com.ar/herramientas/rss-categoria_id=131');
-      break;
     case 'ClarinFut':
       read_channel_item("http://www.clarin.com/rss/deportes/futbol/");
       break;
@@ -75,14 +66,25 @@
       break;
   }
 
+
+  function read_curl_info($url){
+    $curl = curl_init();
+ 
+    curl_setopt($curl, CURLOPT_URL, $url);
+    curl_setopt($curl, CURLOPT_USERAGENT, 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36');
+    
+    $html = curl_exec($curl);
+    curl_close($curl);
+
+    print_r($html);      
+  }
+
   function read_channel_item($url){
     try {
-      $context  = stream_context_create(array('http' => array('header' => 'User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10_9_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/49.0.2623.110 Safari/537.36')));
-      $response = file_get_contents($url, false, $context);
-      $xmlObject = simplexml_load_string($response);
-      $xml = new SimpleXMLElement($response, LIBXML_NOCDATA, true) or die($url." not loading");
-      echo $xml;
+      $xml = simplexml_load_file($url);
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
       foreach($xml->channel->item as $item) {
+        echo $item;
         print_news($item->link, $item->title, $item->description);
       }
     } catch (Exception $e) {
@@ -90,36 +92,26 @@
     }
   }
 
+  
   function read_entry($url){
     try {
-      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true) or die($url." not loading");
-      foreach ($xml->entry as $entry) {
-        print_news($entry->link['href'], $entry->title, $entry->content->div);
-      }
+      $xml = simplexml_load_file($url);
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
+      echo $xml;
+      #foreach($xml->channel->item as $item) {
+      #  echo $item;
+      #  print_news($item->link, $item->title, $item->description);
+      #}
     } catch (Exception $e) {
       echo 'No se descargó XML de ' . $url;
     }
   }
 
-  function read_fawerWayer($url){
-    try {
-      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true) or die($url." not loading");
-      foreach($xml->channel->item as $item) {
-        print_news($item->link, $item->title, $item->description);
-        echo '<br><br><br><br><br><br>';
-      }
-    } catch (Exception $e) {
-      echo 'No se descargó XML de ' . $url;
-    }
-
-  }
   function read_channel_item_weather($url){
     try {
-      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true) or die($url." not loading");
+      $xml = new SimpleXMLElement($url, LIBXML_NOCDATA, true);
       foreach($xml->channel->item as $item) {
-        echo '<hr />';
-        echo '<a style="color:#000000;text-decoration:none"> <h3> ' . strstr($item->title, '-') . ' </h3> </a>';
-        echo '<p>' . strstr($item->description, '<a', true) . '</p>';
+        print_news("", strstr($item->title, '-'), strstr($item->description, '<a', true));
       }
     } catch (Exception $e) {
       echo 'No se descargó XML de ' . $url;
