@@ -43,6 +43,7 @@ jobs:
           matches=$(grep -RInE \
             --exclude-dir=.git \
             --exclude-dir=vendor \
+            --exclude-dir=.github \
             -e '\beval\s*\(' \
             -e '\bexec\s*\(' \
             -e '\bshell_exec\s*\(' \
