@@ -1,56 +1,41 @@
 <!doctype html>
-<html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Lprone Feeds Reader</title>
     <link rel="shortcut icon" href="favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="getrss.css">
-    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
-    <script async src="https://www.googletagmanager.com/gtag/js?id=UA-111005437-1"></script>
-    <script>
-        window.dataLayer = window.dataLayer || [];
-        function gtag(){dataLayer.push(arguments);}
-        gtag('js', new Date());
-        gtag('config', 'UA-111005437-1');
-    </script>   	
-    <script src="getrss.js"></script>
+    <script src="getrss.js" defer></script>
   </head>
 
   <body>
-  <header class="page-header">
-    <div class="container"> 
-      <select id="rssList" onchange="showRSS(this.value)" style="height:40px;">
-        <option disable selected value="">Lprone Feeds Reader</option>
-        <!--option value="Clarin ">Clarin </option-->
-        <option value="LaNacion">La Nacion</option>
-        <option value="Iprofesional">iProfesional</option>
-        <option value="Infobae">Infobae</option>
-        <option disabled>────────────────</option>
-        <option value="LaVoz">La Voz del Interior</option>
-        <option disabled>────────────────</option>
-        <option value="BBC">BBC</option>
-        <option value="CNN">CNN</option>
-        <option value="MuyInt">Muy Interesante</option>
-        <option disabled>────────────────</option>
-        <!--option value="ClarinTecno">Clarin Tecnología</option>
-        <option value="LaVozTecno">La Voz Tecnología</option-->
-        <option value="MuyComputer">Muy Computer</option>
-        <option value="TechCrunch">TechCrunch</option>
-        <option value="FayerWayer">FayerWayer</option>
-        <option disabled>────────────────</option>
-        <option value="ClimaCba">Clima Cordoba</option>
-        <option value="ClimaR4">Clima Rio Cuarto</option>
-        <option value="ClimaVT">Clima Venado Tuerto</option>
-        <option value="ClimaJN">Clima Junin</option>
-        <option disabled>────────────────</option>
-        <!--option value="ClarinFut">Clarin Futbol</option-->
-        <option value="OLE">OLE</option>
-      </select>
-    </div>
-  </header>
-  
-  <section class="page-content">
-    <div id="rssOutput"></div>
-  </section>  
+    <header class="page-header">
+      <div class="container">
+        <label for="rssList" class="sr-only">Choose a feed</label>
+        <select id="rssList" aria-label="Choose a feed" onchange="showRSS(this.value)">
+          <option value="" selected disabled>Lprone Feeds Reader</option>
+          <option disabled>──────────── News ────────────</option>
+          <option value="LaNacion">La Nación</option>
+          <option value="Iprofesional">iProfesional</option>
+          <option value="Infobae">Infobae</option>
+          <option value="BBC">BBC Mundo</option>
+          <option value="MuyInt">Muy Interesante</option>
+          <option value="MuyComputer">Muy Computer</option>
+          <option value="TechCrunch">TechCrunch</option>
+          <option value="FayerWayer">FayerWayer</option>
+          <option value="OLE">OLE</option>
+          <option disabled>──────────── Weather ────────────</option>
+          <option value="ClimaCba">Clima Córdoba</option>
+          <option value="ClimaR4">Clima Río Cuarto</option>
+          <option value="ClimaVT">Clima Venado Tuerto</option>
+          <option value="ClimaJN">Clima Junín</option>
+        </select>
+      </div>
+    </header>
+
+    <section class="page-content">
+      <div class="container" id="rssOutput"></div>
+    </section>
   </body>
 </html>

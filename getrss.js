@@ -1,44 +1,59 @@
-(function($){
-  $(function(){
-    var scroll = $(document).scrollTop();
-    var headerHeight = $('.page-header').outerHeight();
+(function () {
+  'use strict';
 
-    $(window).scroll(function() {
-      // scrolled is new position just obtained
-      var scrolled = $(document).scrollTop();
+  // Sticky header that hides on scroll down, shows on scroll up.
+  (function initHeader() {
+    var header = document.querySelector('.page-header');
+    if (!header) return;
+    var headerHeight = header.offsetHeight;
+    var lastScroll = 0;
 
-      // optionally emulate non-fixed positioning behaviour
-
-      if (scrolled > headerHeight){
-        $('.page-header').addClass('off-canvas');
+    window.addEventListener('scroll', function () {
+      var scrolled = window.pageYOffset || document.documentElement.scrollTop;
+      if (scrolled > headerHeight) {
+        header.classList.add('off-canvas');
       } else {
-        $('.page-header').removeClass('off-canvas');
+        header.classList.remove('off-canvas');
       }
-      if (scrolled > scroll){
-        // scrolling down
-        $('.page-header').removeClass('fixed');
+      if (scrolled > lastScroll) {
+        header.classList.remove('fixed');
       } else {
-        //scrolling up
-        $('.page-header').addClass('fixed');
+        header.classList.add('fixed');
       }
-      scroll = $(document).scrollTop();
-    });
-  });
-})(jQuery);
+      lastScroll = scrolled;
+    }, { passive: true });
+  })();
 
-function showRSS(str) {
-  if (str.length==0) {
-    document.getElementById("rssOutput").innerHTML="";
-    return;
-  }
-  xmlhttp=new XMLHttpRequest();
-  xmlhttp.onreadystatechange=function() {
-    if (xmlhttp.readyState==4 && xmlhttp.status==200) {
-      document.getElementById("rssOutput").innerHTML=xmlhttp.responseText;
+  // Load a feed via AJAX and render it in #rssOutput.
+  window.showRSS = function showRSS(str) {
+    var output = document.getElementById('rssOutput');
+    var select = document.getElementById('rssList');
+    var titleEl = document.title;
+
+    if (!str) {
+      output.innerHTML = '';
+      document.title = 'Lprone Feeds Reader';
+      return;
     }
-  }
-  xmlhttp.open("GET","getrss.php?q="+str,true);
-  xmlhttp.send();
-  window.scrollTo(0, 0);
-  document.title = document.getElementById('rssList').options[document.getElementById('rssList').selectedIndex].text;
-}
+
+    output.innerHTML =
+      '<p class="loading"><span class="spinner"></span> Loading feed…</p>';
+    document.title = 'Loading…';
+
+    fetch('getrss.php?q=' + encodeURIComponent(str), { cache: 'no-store' })
+      .then(function (res) {
+        if (!res.ok) throw new Error('Feed request failed');
+        return res.text();
+      })
+      .then(function (html) {
+        output.innerHTML = html;
+        document.title = select.options[select.selectedIndex].text;
+        window.scrollTo(0, 0);
+      })
+      .catch(function () {
+        output.innerHTML =
+          '<p class="error">Unable to load this feed. Try again later.</p>';
+        document.title = titleEl;
+      });
+  };
+})();
