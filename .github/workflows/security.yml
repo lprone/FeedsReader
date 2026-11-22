@@ -78,7 +78,7 @@ jobs:
       - name: Scan Docker image for vulnerabilities
         uses: aquasecurity/trivy-action@master
         with:
-          image: 'feedsreader:local'
+          image-ref: 'feedsreader:local'
           format: 'table'
           exit-code: '1'
           ignore-unfixed: true
