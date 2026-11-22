@@ -1,0 +1,86 @@
+name: Security validation
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+
+permissions:
+  contents: read
+
+jobs:
+  security:
+    name: Security validation
+    runs-on: ubuntu-latest
+
+    steps:
+      # fetch-depth: 0 is required so TruffleHog can scan git history.
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      # 1. PHP syntax linting - catches malformed PHP before it is deployed.
+      - name: Set up PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.2'
+          extensions: curl, xml, mbstring
+          coverage: none
+
+      - name: Lint PHP files
+        run: |
+          find . -name '*.php' -not -path './vendor/*' -print0 | xargs -0 -n1 php -l
+
+      # 2. Static security pattern scan - flags dangerous PHP functions and
+      # insecure patterns (command injection, insecure TLS settings, etc.).
+      - name: Scan for insecure PHP patterns
+        run: |
+          set +e
+          matches=$(grep -RInE \
+            --exclude-dir=.git \
+            --exclude-dir=vendor \
+            -e '\beval\s*\(' \
+            -e '\bexec\s*\(' \
+            -e '\bshell_exec\s*\(' \
+            -e '\bsystem\s*\(' \
+            -e '\bpassthru\s*\(' \
+            -e '\bpclose\s*\(' \
+            -e '\bpopen\s*\(' \
+            -e '\bproc_open\s*\(' \
+            -e '\bassert\s*\(' \
+            -e '\bcreate_function\s*\(' \
+            -e 'CURLOPT_SSL_VERIFYPEER\s*=>\s*false' \
+            -e 'CURLOPT_SSL_VERIFYHOST\s*=>\s*0' \
+            -e 'allow_url_fopen\s*=\s*On' \
+            -e 'register_globals\s*=\s*On' \
+            . \
+          || true)
+          if [ -n "$matches" ]; then
+            echo "::error::Insecure PHP patterns detected:"
+            echo "$matches"
+            exit 1
+          fi
+          echo "No insecure PHP patterns found."
+
+      # 3. Docker image scan - validates the base image and installed packages
+      # for known vulnerabilities (CVE scan of php:8.2-apache).
+      - name: Build Docker image
+        run: docker build -t feedsreader:local .
+
+      - name: Scan Docker image for vulnerabilities
+        uses: aquasecurity/trivy-action@master
+        with:
+          image: 'feedsreader:local'
+          format: 'table'
+          exit-code: '1'
+          ignore-unfixed: true
+          severity: 'CRITICAL,HIGH'
+
+      # 4. Secret scanning - detects accidentally committed credentials/keys.
+      - name: Scan for secrets
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --results=verified,unknown
